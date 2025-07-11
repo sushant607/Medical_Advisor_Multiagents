@@ -33,7 +33,7 @@
             <button type="submit">Get AI Health Guidance</button>
         </div>
     </form>
-    {% if response %}
+    {% if response_html %}
     <div class="response-section">
         <h3>🤖 AI Health Guidance</h3>
         <p>
@@ -41,7 +41,7 @@
             <span class="agent-badge">{{ agent }}</span>
         {% endfor %}
         </p>
-        <div>{{ response|safe }}</div>
+        <div class="response-text">{{ response_html|safe }}</div>
     </div>
     {% endif %}
 </body>
