@@ -1,48 +1,174 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>🏥 5 AI Health Agents Network</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .input-section { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
-        .response-section { background: #e8f4fd; padding: 20px; border-radius: 8px; }
-        textarea { width: 100%; height: 120px; margin: 10px 0; }
-        button { background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        :root {
+            --primary: #007cba;
+            --secondary: #e8f4fd;
+            --accent: #28a745;
+            --border: #d1e8f8;
+            --shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f6faff;
+            margin: 0; padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 40px auto 0 auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 2.5rem 2rem;
+        }
+        h2 {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 0.5em;
+            text-align: center;
+        }
+        .input-section {
+            background: #f5faff;
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5em;
+            margin-bottom: 2.2em;
+        }
+        label { font-weight: 600; color: #444; }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            border-radius: 7px;
+            border: 1.2px solid #bed9ee;
+            font-size: 1.06em;
+            padding: 0.8em;
+            resize: vertical;
+            margin: 8px 0 14px 0;
+            font-family: inherit;
+        }
+        select, input[type="file"] {
+            margin: 8px 0;
+            font-size: 1em;
+        }
+        button {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            padding: 0.7em 1.8em;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 12px;
+            transition: background 0.15s;
+        }
         button:hover { background: #005a87; }
-        .agent-badge { display: inline-block; background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin: 2px; }
+
+        .response-section {
+            background: var(--secondary);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 2em 1.5em;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5em;
+        }
+        .agent-list {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 0.5em;
+            gap: 0.3em;
+        }
+        .agent-badge {
+            background: var(--accent);
+            color: #fff;
+            padding: 3px 14px;
+            border-radius: 14px;
+            font-size: 0.96em;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+
+        .model-response {
+            font-size: 1.09em;
+            line-height: 1.7;
+            color: #2b415b;
+        }
+        .model-response p {
+            margin: 0.3em 0 0.7em 0;
+        }
+        .model-response strong, .model-response b {
+            color: #004a7a;
+        }
+        .model-response ul, .model-response ol {
+            margin-left: 1.6em;
+            margin-bottom: 1em;
+        }
+        .model-response pre, .model-response code {
+            background: #e0eefb;
+            padding: 0.4em 0.8em;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: "Fira Mono", "Consolas", "Monaco", monospace;
+            display: block;
+            margin: 1em 0;
+            overflow-x: auto;
+        }
+        .disclaimer {
+            font-size: 0.98em;
+            color: #606060;
+            margin-top: 2em;
+            text-align: center;
+        }
+        @media (max-width: 700px) {
+            .container { padding: 1.1em 0.4em; }
+            .response-section, .input-section { padding: 1.1em; }
+        }
     </style>
 </head>
 <body>
-    <h2>🏥 5 AI Health Agents Network</h2>
-    <form method="post" enctype="multipart/form-data">
-        <div class="input-section">
-            <label for="user_input"><b>Enter Your Health Data</b></label><br>
-            <textarea id="user_input" name="user_input" required>{{ user_input or "" }}</textarea>
-            <br>
-            <label for="data_type">Input Type (optional):</label>
-            <select name="data_type" id="data_type">
-                <option value="">Auto-detect input type</option>
-                <option value="lab_results">Lab Results & Biomarkers</option>
-                <option value="meal_logging">Food & Nutrition</option>
-                <option value="training_data">Workout & Training</option>
-                <option value="weekly_checkin">Weekly Progress Check-in</option>
-                <option value="medical_question">Medical Question</option>
-            </select>
-            <br><br>
-            <input type="file" name="file">
-            <button type="submit">Get AI Health Guidance</button>
+    <div class="container">
+        <h2>🏥 5 AI Health Agents Network</h2>
+        <form method="post" enctype="multipart/form-data" autocomplete="off">
+            <div class="input-section">
+                <label for="user_input">Enter Your Health Data</label><br>
+                <textarea id="user_input" name="user_input" required autofocus>{{ user_input or "" }}</textarea>
+                <br>
+                <label for="data_type">Input Type (optional):</label>
+                <select name="data_type" id="data_type">
+                    <option value="">Auto-detect input type</option>
+                    <option value="lab_results">Lab Results & Biomarkers</option>
+                    <option value="meal_logging">Food & Nutrition</option>
+                    <option value="training_data">Workout & Training</option>
+                    <option value="weekly_checkin">Weekly Progress Check-in</option>
+                    <option value="medical_question">Medical Question</option>
+                </select>
+                <br><br>
+                <input type="file" name="file">
+                <button type="submit">Get AI Health Guidance</button>
+            </div>
+        </form>
+        {% if response %}
+        <div class="response-section" id="ai-response">
+            <div class="agent-list">
+                {% for agent in agents_used %}
+                    <span class="agent-badge">{{ agent|capitalize }}</span>
+                {% endfor %}
+            </div>
+            <div class="model-response">{{ response|safe }}</div>
         </div>
-    </form>
-    {% if response_html %}
-    <div class="response-section">
-        <h3>🤖 AI Health Guidance</h3>
-        <p>
-        {% for agent in agents_used %}
-            <span class="agent-badge">{{ agent }}</span>
-        {% endfor %}
-        </p>
-        <div class="response-text">{{ response_html|safe }}</div>
+        <div class="disclaimer">
+            ⚠️ Not a substitute for personalised medical advice. Always consult your healthcare provider.
+        </div>
+        <script>
+            // Auto-scroll to response on render
+            document.getElementById('ai-response').scrollIntoView({behavior: 'smooth'});
+        </script>
+        {% endif %}
     </div>
-    {% endif %}
 </body>
 </html>
