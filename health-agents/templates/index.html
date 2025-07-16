@@ -1,174 +1,984 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>🏥 5 AI Health Agents Network</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏥 H3O AI Health Agents Network</title>
     <style>
         :root {
-            --primary: #007cba;
-            --secondary: #e8f4fd;
-            --accent: #28a745;
-            --border: #d1e8f8;
-            --shadow: 0 2px 10px rgba(0,0,0,0.05);
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --border-radius: 12px;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+            --chat-bg: #ffffff;
+            --user-msg-bg: #007bff;
+            --bot-msg-bg: #f1f3f4;
         }
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f6faff;
-            margin: 0; padding: 0;
-        }
-        .container {
-            max-width: 700px;
-            margin: 40px auto 0 auto;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: var(--shadow);
-            padding: 2.5rem 2rem;
-        }
-        h2 {
-            color: var(--primary);
-            font-weight: 700;
-            margin-bottom: 0.5em;
-            text-align: center;
-        }
-        .input-section {
-            background: #f5faff;
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5em;
-            margin-bottom: 2.2em;
-        }
-        label { font-weight: 600; color: #444; }
-        textarea {
-            width: 100%;
-            min-height: 120px;
-            border-radius: 7px;
-            border: 1.2px solid #bed9ee;
-            font-size: 1.06em;
-            padding: 0.8em;
-            resize: vertical;
-            margin: 8px 0 14px 0;
-            font-family: inherit;
-        }
-        select, input[type="file"] {
-            margin: 8px 0;
-            font-size: 1em;
-        }
-        button {
-            background: var(--primary);
-            color: #fff;
-            font-weight: 700;
-            padding: 0.7em 1.8em;
-            border: none;
-            border-radius: 7px;
-            cursor: pointer;
-            font-size: 1em;
-            margin-top: 12px;
-            transition: background 0.15s;
-        }
-        button:hover { background: #005a87; }
 
-        .response-section {
-            background: var(--secondary);
-            border: 1.5px solid var(--border);
-            border-radius: 12px;
-            padding: 2em 1.5em;
-            box-shadow: var(--shadow);
-            margin-bottom: 1.5em;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .agent-list {
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .chat-container {
+            max-width: 900px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--chat-bg);
+            box-shadow: 0 0 50px rgba(0,0,0,0.2);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s infinite;
+        }
+
+        .chat-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chat-header .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .online-indicator {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            z-index: 1;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: blink 2s infinite;
+        }
+
+        .agents-bar {
+            background: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+
+        .agent-chip {
+            background: white;
+            border: 2px solid #e9ecef;
+            color: var(--dark-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .agent-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .agent-chip.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .agent-chip.psychology { border-color: #6f42c1; }
+        .agent-chip.psychology.active { background: #6f42c1; }
+        
+        .agent-chip.h3o { border-color: #dc3545; }
+        .agent-chip.h3o.active { background: #dc3545; }
+        
+        .agent-chip.dayone { border-color: #17a2b8; }
+        .agent-chip.dayone.active { background: #17a2b8; }
+        
+        .agent-chip.mha { border-color: #ffc107; }
+        .agent-chip.mha.active { background: #ffc107; color: #212529; }
+        
+        .agent-chip.vpc { border-color: #6610f2; }
+        .agent-chip.vpc.active { background: #6610f2; }
+        
+        .agent-chip.precision_med { border-color: #20c997; }
+        .agent-chip.precision_med.active { background: #20c997; }
+        
+        .agent-chip.orchestrator { border-color: #fd7e14; }
+        .agent-chip.orchestrator.active { background: #fd7e14; }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+            position: relative;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            opacity: 0;
+            animation: slideIn 0.5s ease forwards;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, var(--success-color) 0%, #1e7e34 100%);
+        }
+
+        .message-content {
+            background: white;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            max-width: 70%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .message.bot .message-content {
+            background: var(--bot-msg-bg);
+            border: 1px solid #e9ecef;
+        }
+
+        .message-content::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+        }
+
+        .message.user .message-content::before {
+            right: -8px;
+            border-width: 8px 0 8px 8px;
+            border-color: transparent transparent transparent var(--primary-color);
+        }
+
+        .message.bot .message-content::before {
+            left: -8px;
+            border-width: 8px 8px 8px 0;
+            border-color: transparent var(--bot-msg-bg) transparent transparent;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #666;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+
+        .agents-used {
             display: flex;
             flex-wrap: wrap;
-            margin-bottom: 0.5em;
-            gap: 0.3em;
-        }
-        .agent-badge {
-            background: var(--accent);
-            color: #fff;
-            padding: 3px 14px;
-            border-radius: 14px;
-            font-size: 0.96em;
-            letter-spacing: 0.5px;
-            font-weight: 600;
-            margin-right: 8px;
+            gap: 8px;
+            margin-top: 10px;
         }
 
-        .model-response {
-            font-size: 1.09em;
-            line-height: 1.7;
-            color: #2b415b;
+        .agent-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
         }
-        .model-response p {
-            margin: 0.3em 0 0.7em 0;
+
+        .agent-badge.psychology { background: #6f42c1; }
+        .agent-badge.h3o { background: #dc3545; }
+        .agent-badge.dayone { background: #17a2b8; }
+        .agent-badge.mha { background: #ffc107; color: #212529; }
+        .agent-badge.vpc { background: #6610f2; }
+        .agent-badge.precision_med { background: #20c997; }
+        .agent-badge.orchestrator { background: #fd7e14; }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            opacity: 0;
+            animation: slideIn 0.5s ease forwards;
         }
-        .model-response strong, .model-response b {
-            color: #004a7a;
+
+        .typing-indicator.show {
+            display: flex;
         }
-        .model-response ul, .model-response ol {
-            margin-left: 1.6em;
-            margin-bottom: 1em;
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            background: var(--bot-msg-bg);
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            border: 1px solid #e9ecef;
         }
-        .model-response pre, .model-response code {
-            background: #e0eefb;
-            padding: 0.4em 0.8em;
-            border-radius: 5px;
-            font-size: 1em;
-            font-family: "Fira Mono", "Consolas", "Monaco", monospace;
-            display: block;
-            margin: 1em 0;
-            overflow-x: auto;
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            animation: typing 1.4s infinite;
         }
-        .disclaimer {
-            font-size: 0.98em;
-            color: #606060;
-            margin-top: 2em;
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .welcome-message {
             text-align: center;
+            padding: 40px 20px;
+            color: var(--secondary-color);
         }
-        @media (max-width: 700px) {
-            .container { padding: 1.1em 0.4em; }
-            .response-section, .input-section { padding: 1.1em; }
+
+        .welcome-message h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
         }
-    </style>
+
+        .welcome-message p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .quick-action {
+            background: white;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quick-action:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .chat-input-section {
+            background: white;
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            min-height: 50px;
+            max-height: 120px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: none;
+            transition: var(--transition);
+            background: #fafbfc;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.25);
+            background: white;
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            box-shadow: 0 2px 10px rgba(0,123,255,0.3);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,123,255,0.4);
+        }
+
+        .send-btn:disabled {
+            background: var(--secondary-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--danger-color);
+            margin: 10px 0;
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--danger-color);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 1000;
+            display: none;
+        }
+
+        .connection-status.connected {
+            background: var(--success-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes blink {
+            0%, 50% {
+                opacity: 1;
+            }
+            51%, 100% {
+                opacity: 0.3;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .chat-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .agents-bar {
+                padding: 10px;
+            }
+            
+            .agent-chip {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .online-indicator {
+                position: static;
+                justify-content: center;
+                margin-top: 10px;
+            }
+        }
+    .citation-link { color: #007bff; text-decoration: underline dotted; font-size: 0.85em; vertical-align: super; }
+.citation-link:hover { color: #0056b3; }
+.citations-list ol { font-size: 0.9em; }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h2>🏥 5 AI Health Agents Network</h2>
-        <form method="post" enctype="multipart/form-data" autocomplete="off">
-            <div class="input-section">
-                <label for="user_input">Enter Your Health Data</label><br>
-                <textarea id="user_input" name="user_input" required autofocus>{{ user_input or "" }}</textarea>
-                <br>
-                <label for="data_type">Input Type (optional):</label>
-                <select name="data_type" id="data_type">
-                    <option value="">Auto-detect input type</option>
-                    <option value="lab_results">Lab Results & Biomarkers</option>
-                    <option value="meal_logging">Food & Nutrition</option>
-                    <option value="training_data">Workout & Training</option>
-                    <option value="weekly_checkin">Weekly Progress Check-in</option>
-                    <option value="medical_question">Medical Question</option>
-                </select>
-                <br><br>
-                <input type="file" name="file">
-                <button type="submit">Get AI Health Guidance</button>
-            </div>
-        </form>
-        {% if response %}
-        <div class="response-section" id="ai-response">
-            <div class="agent-list">
-                {% for agent in agents_used %}
-                    <span class="agent-badge">{{ agent|capitalize }}</span>
-                {% endfor %}
-            </div>
-            <div class="model-response">{{ response|safe }}</div>
-        </div>
-        <div class="disclaimer">
-            ⚠️ Not a substitute for personalised medical advice. Always consult your healthcare provider.
-        </div>
-        <script>
-            // Auto-scroll to response on render
-            document.getElementById('ai-response').scrollIntoView({behavior: 'smooth'});
-        </script>
-        {% endif %}
+    <div class="connection-status" id="connectionStatus">
+        Server Offline
     </div>
+
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <h1>🏥 H3O AI Health Network</h1>
+            <div class="subtitle">Your AI-powered health companion</div>
+            <div class="online-indicator">
+                <div class="status-dot"></div>
+                <span>Agents Online</span>
+            </div>
+        </div>
+
+        <!-- Agents Bar -->
+        <div class="agents-bar">
+            <div class="agent-chip psychology" data-agent="psychology">
+                <span>🧠 Psychology</span>
+            </div>
+            <div class="agent-chip h3o" data-agent="h3o">
+                <span>⚗️ H3O</span>
+            </div>
+            <div class="agent-chip dayone" data-agent="dayone">
+                <span>📅 DayOne</span>
+            </div>
+            <div class="agent-chip mha" data-agent="mha">
+                <span>📊 MHA</span>
+            </div>
+            <div class="agent-chip vpc" data-agent="vpc">
+                <span>💪 VPC</span>
+            </div>
+            <div class="agent-chip precision_med" data-agent="precision_med">
+                <span>🔬 Precision Med</span>
+            </div>
+            <div class="agent-chip orchestrator" data-agent="orchestrator">
+                <span>🎯 Orchestrator</span>
+            </div>
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h3>Welcome to H3O AI Health Network! 👋</h3>
+                <p>I'm here to help you with your health journey. Select an agent above or ask me anything about nutrition, fitness, mental health, lab results, or any health-related questions.</p>
+                <div class="quick-actions">
+                    <div class="quick-action" onclick="sendQuickMessage('Tell me about my recent lab results')">📋 Lab Results</div>
+                    <div class="quick-action" onclick="sendQuickMessage('Help me plan a healthy meal')">🍽️ Meal Planning</div>
+                    <div class="quick-action" onclick="sendQuickMessage('Create a workout routine')">🏋️ Workout Plan</div>
+                    <div class="quick-action" onclick="sendQuickMessage('I need stress management tips')">😌 Stress Relief</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="message-avatar">🤖</div>
+            <div class="typing-dots">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+
+        <!-- Chat Input -->
+        <div class="chat-input-section">
+            <div class="input-container">
+                <textarea 
+                    class="chat-input" 
+                    id="messageInput" 
+                    placeholder="Ask me anything about your health..."
+                    rows="1"
+                    onkeypress="handleKeyPress(event)"
+                    oninput="autoResize(this)"
+                ></textarea>
+                <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                    <span>➤</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedAgent = null;
+        let messageCount = 0;
+        let isServerOnline = false;
+        const API_BASE_URL = 'http://localhost:8000';
+
+        // Check server status on load
+        window.addEventListener('load', checkServerStatus);
+
+        async function checkServerStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                if (response.ok) {
+                    isServerOnline = true;
+                    updateConnectionStatus(true);
+                } else {
+                    isServerOnline = false;
+                    updateConnectionStatus(false);
+                }
+            } catch (error) {
+                console.error('Server check failed:', error);
+                isServerOnline = false;
+                updateConnectionStatus(false);
+            }
+        }
+
+        function updateConnectionStatus(online) {
+            const statusElement = document.getElementById('connectionStatus');
+            if (online) {
+                statusElement.textContent = 'Server Online';
+                statusElement.classList.add('connected');
+                statusElement.style.display = 'none';
+            } else {
+                statusElement.textContent = 'Server Offline';
+                statusElement.classList.remove('connected');
+                statusElement.style.display = 'block';
+            }
+        }
+
+        // Auto-resize textarea
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        // Handle Enter key
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        // Agent selection
+        document.querySelectorAll('.agent-chip').forEach(chip => {
+            chip.addEventListener('click', function() {
+                // Remove active class from all chips
+                document.querySelectorAll('.agent-chip').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked chip
+                this.classList.add('active');
+                selectedAgent = this.dataset.agent;
+                
+                updatePlaceholder();
+            });
+        });
+
+        function updatePlaceholder() {
+            const input = document.getElementById('messageInput');
+            if (selectedAgent) {
+                input.placeholder = `Ask the ${selectedAgent} agent about your health...`;
+            } else {
+                input.placeholder = 'Ask me anything about your health...';
+            }
+        }
+
+        // Send message
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Check server status first
+            if (!isServerOnline) {
+                await checkServerStatus();
+                if (!isServerOnline) {
+                    showErrorMessage('Server is offline. Please make sure your FastAPI server is running on http://localhost:8000');
+                    return;
+                }
+            }
+            
+            // Disable send button
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+            
+            addMessage(message, 'user');
+            input.value = '';
+            input.style.height = '50px';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            try {
+                // Prepare request data
+                const requestData = {
+                    agent_type: selectedAgent || 'general',
+                    user_input: message,
+                    context: {},
+                    data_type: null
+                };
+
+                // Send to FastAPI backend with proper headers
+                const response = await fetch(`${API_BASE_URL}/process`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                hideTypingIndicator();
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    showErrorMessage(data.error);
+                } else {
+                    // Add bot response
+                    addMessage(data.response, 'bot', data.agents_used);
+                    updateConnectionStatus(true);
+                }
+                
+            } catch (error) {
+                hideTypingIndicator();
+                console.error('Error details:', error);
+                
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showErrorMessage('Unable to connect to the server. Please ensure your FastAPI server is running on http://localhost:8000 and CORS is properly configured.');
+                } else {
+                    showErrorMessage(`Connection failed: ${error.message}. Please check your server configuration.`);
+                }
+                
+                isServerOnline = false;
+                updateConnectionStatus(false);
+            }
+            
+            // Re-enable send button
+            sendBtn.disabled = false;
+        }
+
+        function sendQuickMessage(message) {
+            document.getElementById('messageInput').value = message;
+            sendMessage();
+        }
+
+        
+function addMessage(text, sender, agentsUsed = [], citations = []) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+
+    let agentsHTML = '';
+    if (agentsUsed && agentsUsed.length > 0) {
+        agentsHTML = `
+            <div class="agents-used">
+                ${agentsUsed.map(agent => `<div class="agent-badge ${agent.toLowerCase().replace(' ', '_')}">${agent}</div>`).join('')}
+            </div>
+        `;
+    }
+
+    // --- NEW: Render citations as hyperlinks if present ---
+    let citationsHtml = '';
+    if (citations && citations.length > 0) {
+        // Inline superscript hyperlinks
+        let newText = text;
+        citations.forEach((citation, idx) => {
+            const num = idx + 1;
+            let url = typeof citation === "string" ? citation : (citation.url || citation.link || "#");
+            // Replace [n] with a clickable link if present in text
+            newText = newText.replace(
+                new RegExp(`\[${num}\]`, 'g'),
+                `<a href="${url}" class="citation-link" target="_blank" rel="noopener">[${num}]</a>`
+            );
+        });
+        text = newText;
+
+        // Reference list
+        citationsHtml = `
+            <div class="citations-list" style="margin-top:10px;">
+                <b>References:</b>
+                <ol style="margin:8px 0 0 18px;padding:0;">
+                    ${citations.map((citation, idx) => {
+                        let url = typeof citation === "string" ? citation : (citation.url || citation.link || "#");
+                        let label = citation.title || url;
+                        return `<li><a href="${url}" target="_blank" rel="noopener">${label}</a></li>`;
+                    }).join('')}
+                </ol>
+            </div>
+        `;
+    }
+
+    messageDiv.innerHTML = `
+        <div class="message-avatar">
+            ${sender === 'user' ? '👤' : '🤖'}
+        </div>
+        <div class="message-content">
+            <div>${text}</div>
+            ${agentsHTML}
+            ${citationsHtml}
+            <div class="message-time">${timeString}</div>
+        </div>
+    `;
+    
+    // Remove welcome message if it exists
+    const welcomeMessage = messagesContainer.querySelector('.welcome-message');
+    if (welcomeMessage) {
+        welcomeMessage.remove();
+    }
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+
+        function showTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.classList.add('show');
+            indicator.style.display = 'flex';
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            indicator.classList.remove('show');
+            indicator.style.display = 'none';
+        }
+
+        function showErrorMessage(message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">⚠️</div>
+                <div class="message-content">
+                    <div class="error-message">${message}</div>
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+          
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('messageInput').focus();
+            checkServerStatus();
+        });
+        function addMessage(text, sender, agentsUsed = [], citations = []) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+
+    let agentsHTML = '';
+    if (agentsUsed && agentsUsed.length > 0) {
+        agentsHTML = `
+            <div class="agents-used">
+                ${agentsUsed.map(agent => `<div class="agent-badge ${agent.toLowerCase().replace(' ', '_')}">${agent}</div>`).join('')}
+            </div>
+        `;
+    }
+
+    // --- Render citations as hyperlinks if present ---
+    let citationsHtml = '';
+    if (citations && citations.length > 0) {
+        // Inline hyperlink superscripts in message
+        let newText = text;
+        citations.forEach((citation, idx) => {
+            const num = idx + 1;
+            let url = typeof citation === "string" ? citation : (citation.url || citation.link || "#");
+            newText = newText.replace(
+                new RegExp(`\\[${num}\\]`, 'g'),
+                `<a href="${url}" class="citation-link" target="_blank" rel="noopener">[${num}]</a>`
+            );
+        });
+        text = newText;
+
+        // Reference list
+        citationsHtml = `
+            <div class="citations-list" style="margin-top:10px;">
+                <b>References:</b>
+                <ol style="margin:8px 0 0 18px;padding:0;">
+                    ${citations.map((citation, idx) => {
+                        let url = typeof citation === "string" ? citation : (citation.url || citation.link || "#");
+                        let label = citation.title || url;
+                        return `<li><a href="${url}" target="_blank" rel="noopener">${label}</a></li>`;
+                    }).join('')}
+                </ol>
+            </div>
+        `;
+    }
+
+    messageDiv.innerHTML = `
+        <div class="message-avatar">
+            ${sender === 'user' ? '👤' : '🤖'}
+        </div>
+        <div class="message-content">
+            <div>${text}</div>
+            ${agentsHTML}
+            ${citationsHtml}
+            <div class="message-time">${timeString}</div>
+        </div>
+    `;
+    
+    // Remove welcome message if it exists
+    const welcomeMessage = messagesContainer.querySelector('.welcome-message');
+    if (welcomeMessage) {
+        welcomeMessage.remove();
+    }
+    
+    messagesContainer.appendChild(messageDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+    </script>
 </body>
 </html>

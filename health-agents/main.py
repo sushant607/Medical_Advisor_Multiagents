@@ -16,23 +16,14 @@ class HealthAgentNetwork:
         }
         self.router = MasterRouter()
 
-    def process_user_input(self, user_data: str, data_type: str = None) -> str:
-        if not data_type:
-            data_type = self.router.classify_input(user_data)
-        agent_names = self.router.get_agents_for_input(data_type)
-        agent_results = []
-        for agent_name in agent_names:
-            if agent_name in self.agents:
-                result = self.agents[agent_name].process(user_data)
-                agent_results.append({
-                    'agent': agent_name,
-                    'response': result
-                })
-        if len(agent_results) > 1:
-            synthesis_data = [f"**{r['agent'].upper()}**: {r['response']}" for r in agent_results]
-            final_response = self.agents['h3o'].synthesize_recommendations(synthesis_data)
-            return final_response
-        return agent_results[0]['response'] if agent_results else "No agents available to process this request."
+    def process_user_input(self, user_data: str, *args, **kwargs) -> str:
+        print("***** PATCHED: process_user_input is running *****")
+        print("ARGS:", args, "KWARGS:", kwargs)
+        agent_name = self.router.classify_input(user_data)
+        if agent_name not in self.agents:
+            return f"No suitable agent found for input: {agent_name}"
+        result = self.agents[agent_name].process(user_data)
+        return result
 
 if __name__ == "__main__":
     network = HealthAgentNetwork()
