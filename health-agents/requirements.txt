@@ -1,6 +1,9 @@
-anthropic
-python-dotenv
 fastapi
-uvicorn
+uvicorn[standard]
 jinja2
+python-dotenv
+openai
+pydantic
+httpx
+aiofiles
 python-multipart
